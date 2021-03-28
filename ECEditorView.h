@@ -1,12 +1,19 @@
 #ifndef ECEditorView_h
 #define ECEditorView_h
 
-class ECEditorView
+#include "ECTextViewImp.h"
+#include "ECTextDocument.h"
+
+class ECEditorView : ECObserver
 {
 public:
-    ECEditorView();
+    // Observer functions
+    virtual ~ECEditorView();
+    virtual void Update();
 
-    ~ECEditorView();
+private:
+    ECTextViewImp tv;
+    ECTextDocument subject;
 };
 
 #endif
