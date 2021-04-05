@@ -9,23 +9,23 @@ using namespace std;
 //           TEXT DOCUMENT
 //----------------------------------------------------------------
 
-//(ECEditorView &v) : view(v) {}
 ECTextDocument ::ECTextDocument(ECEditorView &v) : view(v)
 {
-    curX = view.GetCursorX();
-    curY = view.GetCursorY();
+    pageIndex = 0;
 }
 
 ECTextDocument ::~ECTextDocument() {}
 
-void ECTextDocument ::SendToView(int row, int col)
+void ECTextDocument ::SendToView(int row, int col, int page)
 {
     view.SetRows(listRows, row, col);
 }
 
-void ECTextDocument ::InsertChar(char c)
+void ECTextDocument ::InsertChar(char c, int row, int col)
 {
-    //view.AddRow("Insert Char Running");
+    int curX = col; //view.GetCursorX();
+    int curY = row; //view.GetCursorY();
+
     string s = string(1, c);
     if (listRows.size() <= curY)
     {
@@ -42,13 +42,19 @@ void ECTextDocument ::InsertChar(char c)
 
     curX += 1;
 
-    SendToView(curY, curX);
+    SendToView(curY, curX, pageIndex);
 }
 
-void ECTextDocument ::EraseChar(int row, int col)
+char ECTextDocument ::EraseChar(int row, int col)
 {
+    int curX = col; //view.GetCursorX();
+    int curY = row; //view.GetCursorY();
+
+    char toRemove;
+
     if (curX > 0)
     {
+        toRemove = listRows[curY].at(curX - 1);
         listRows[curY].erase(curX - 1, 1);
         curX -= 1;
     }
@@ -69,11 +75,16 @@ void ECTextDocument ::EraseChar(int row, int col)
         }
     }
 
-    SendToView(curY, curX);
+    SendToView(curY, curX, pageIndex);
+
+    return toRemove;
 }
 
 void ECTextDocument ::MoveCursor(int direction)
 {
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
     if (direction == ARROW_LEFT)
     {
         if (curX > 0)
@@ -129,33 +140,32 @@ void ECTextDocument ::MoveCursor(int direction)
         }
     }
 
-    SendToView(curY, curX);
+    SendToView(curY, curX, pageIndex);
 }
 
 void ECTextDocument ::AddNewLine(int row, int col)
 {
-    string extra = listRows[curY].substr(curX);
-    listRows[curY].erase(listRows[curY].begin() + curX, listRows[curY].end());
-    curY++;
-    listRows.insert(listRows.begin() + curY, extra);
-    //listRows.push_back(extra);
-    curX = 0;
+    int curX = col; //view.GetCursorX();
+    int curY = row; //view.GetCursorY();
 
-    SendToView(curY, curX);
-}
+    if (listRows.size() == 0)
+    {
+        listRows.push_back("");
+        listRows.push_back("");
+        curX = 0;
+        curY = 1;
+    }
+    else
+    {
+        string extra = listRows[curY].substr(curX);
+        listRows[curY].erase(listRows[curY].begin() + curX, listRows[curY].end());
+        curY++;
+        listRows.insert(listRows.begin() + curY, extra);
+        //listRows.push_back(extra);
+        curX = 0;
+    }
 
-void ECTextDocument ::Test()
-{
-    listRows.push_back("Testing running");
-}
-
-int ECTextDocument ::GetCursorX()
-{
-    return curX;
-}
-int ECTextDocument ::GetCursorY()
-{
-    return curY;
+    SendToView(curY, curX, pageIndex);
 }
 
 //-------------------------------------------------------------
@@ -169,7 +179,7 @@ InsertCommand ::~InsertCommand() {}
 
 void InsertCommand ::Execute()
 {
-    doc.InsertChar(charToInsert);
+    doc.InsertChar(charToInsert, rowPos, colPos);
     //doc.Test();
 }
 
@@ -188,11 +198,12 @@ RemoveCommand ::~RemoveCommand() {}
 
 void RemoveCommand ::Execute()
 {
-    doc.EraseChar(rowPos, colPos);
+    charRemoved = doc.EraseChar(rowPos, colPos);
 }
 
 void RemoveCommand ::UnExecute()
 {
+    doc.InsertChar(charRemoved, rowPos, colPos);
 }
 
 //-------------------------------------------------------------

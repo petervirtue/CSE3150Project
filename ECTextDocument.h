@@ -8,12 +8,10 @@
 #include <vector>
 #include <string>
 
-// Text Document
-
 class ECTextDocument;
 
 //----------------------------------------------------------------
-//           COMMANDs
+//           COMMANDS
 //----------------------------------------------------------------
 
 // Insert
@@ -45,6 +43,7 @@ private:
     ECTextDocument &doc;
     int rowPos;
     int colPos;
+    char charRemoved;
 };
 
 // Command to add new row or break one line into two
@@ -75,13 +74,10 @@ private:
     int arrowKey;
 };
 
-class KeyEvtHdler
-{
-};
+//----------------------------------------------------------------
+//           TEXT DOCUMENT
+//----------------------------------------------------------------
 
-class ArrowKeyHdler : public KeyEvtHdler
-{
-};
 class ECTextDocument
 {
 public:
@@ -94,26 +90,17 @@ public:
     ECEditorView GetEditorView();
 
     // Text Manipulation
-    void InsertChar(char c);
-    void EraseChar(int row, int col);
+    void InsertChar(char c, int row, int col);
+    char EraseChar(int row, int col);
     void AddNewLine(int row, int col);
     void MoveCursor(int direction);
 
-    //char GetCharAt(int row, int col) const;
-
-    void Test();
-
-    // Cursor Action
-    int GetCursorX();
-    int GetCursorY();
-
     // View Management
-    void SendToView(int row, int col);
+    void SendToView(int row, int col, int page);
 
 private:
     ECEditorView &view;
     std::vector<std::string> listRows;
-    int curX;
-    int curY;
+    int pageIndex;
 };
 #endif

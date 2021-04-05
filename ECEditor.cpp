@@ -6,6 +6,10 @@
 
 using namespace std;
 
+//----------------------------------------------------------------
+//           EDITOR
+//----------------------------------------------------------------
+
 int main(int argc, char *argv[])
 {
     ECTextViewImp *imp = new ECTextViewImp();

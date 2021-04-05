@@ -42,12 +42,16 @@ bool ECCommandHistory ::Redo()
         // still return true
         return true;
     }
+    else if (position < listOfCommands.size())
+    {
+        position++;
+        listOfCommands[position]->Execute();
+
+        return false;
+    }
 
     // advance position and execute
-    position++;
-    listOfCommands[position]->Execute();
-
-    return false;
+    return true;
 }
 
 void ECCommandHistory ::ExecuteCmd(ECCommand *pCmd)
@@ -55,5 +59,11 @@ void ECCommandHistory ::ExecuteCmd(ECCommand *pCmd)
     // push back and execute
     listOfCommands.push_back(pCmd);
     position++;
+    pCmd->Execute();
+}
+
+void ECCommandHistory ::ExecuteMove(ECCommand *pCmd)
+{
+    listMovements.push_back(pCmd);
     pCmd->Execute();
 }

@@ -6,6 +6,10 @@
 #include <vector>
 #include <string>
 
+//----------------------------------------------------------------
+//           EDITOR VIEW
+//----------------------------------------------------------------
+
 class ECEditorView
 {
 public:
@@ -33,9 +37,16 @@ public:
     // Cursor Positions
     int GetCursorX();
     int GetCursorY();
+    int GetViewRows();
+
+    std::string status;
 
 private:
     ECTextViewImp tvimp;
+    int curX;
+    int curY;
+    int pageY;
+    int pageIndex;
 };
 
 #endif

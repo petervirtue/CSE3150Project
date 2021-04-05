@@ -5,7 +5,10 @@
 #include "ECObserver.h"
 #include "ECEditorView.h"
 
-// Editor Controller
+//----------------------------------------------------------------
+//           EDITOR CONTROLLER
+//----------------------------------------------------------------
+
 class ECEditorController : public ECObserver
 {
 public:
