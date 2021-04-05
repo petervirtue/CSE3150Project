@@ -36,7 +36,7 @@ void ECEditorController ::Update()
     {
         // Control Q pressed
         //view.Quit();
-        view.AddRow("Quit Received");
+        view.Clear();
         view.Quit();
     }
     else if (key == BACKSPACE)

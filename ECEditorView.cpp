@@ -51,7 +51,6 @@ void ECEditorView ::Refresh()
 void ECEditorView ::Clear()
 {
     tvimp.InitRows();
-    tvimp.AddRow("Clear Ran");
 }
 
 void ECEditorView ::AttachController(ECObserver *ob)
