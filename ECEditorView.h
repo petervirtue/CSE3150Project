@@ -29,7 +29,7 @@ public:
     // Row management
     void AddRow(std::string row);
     void RemoveRow(int row);
-    void SetRows(std::vector<std::string> rowsIn, int row, int col);
+    void SetRows(std::vector<std::string> rowsIn, int row, int col, std::string fName);
 
     // Get Key pressed
     int GetKeyPressed();
