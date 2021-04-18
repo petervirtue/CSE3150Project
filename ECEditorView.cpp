@@ -61,7 +61,7 @@ void ECEditorView ::AttachController(ECObserver *ob)
     tvimp.Attach(ob);
 }
 
-void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col)
+void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col, std::string fName)
 {
     // cursor handling
     curX = col;
@@ -89,7 +89,7 @@ void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col)
     tvimp.SetCursorX(curX);
     tvimp.SetCursorY(pageY);
 
-    string left = "Editing - Line " + to_string(curY + 1) + " - Page " + to_string(page + 1);
+    string left = "Editing " + fName + " - Line " + to_string(curY + 1) + " - Page " + to_string(page + 1);
 
     tvimp.ClearStatusRows();
     tvimp.AddStatusRow(left, "Peter Virtue - CSE 3150", false);

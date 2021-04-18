@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -9,16 +11,21 @@ using namespace std;
 //           TEXT DOCUMENT
 //----------------------------------------------------------------
 
-ECTextDocument ::ECTextDocument(ECEditorView &v) : view(v)
+ECTextDocument ::ECTextDocument(ECEditorView &v, std::string &fileName) : view(v), fName(fileName)
 {
     pageIndex = 0;
+
+    // EXP - Setting lines from a given file
+    listRows = GetLinesFromFile();
+    view.SetRows(listRows, 0, 0, fName);
 }
 
 ECTextDocument ::~ECTextDocument() {}
 
 void ECTextDocument ::SendToView(int row, int col, int page)
 {
-    view.SetRows(listRows, row, col);
+    SetLinesInFile();
+    view.SetRows(listRows, row, col, fName);
 }
 
 void ECTextDocument ::InsertChar(char c, int row, int col)
@@ -67,11 +74,6 @@ char ECTextDocument ::EraseChar(int row, int col)
         if (extra.size() != 0)
         {
             listRows[curY].append(extra);
-        }
-        else if (curX > 0)
-        {
-            listRows[curY].erase(curX - 1, 1);
-            curX--;
         }
     }
 
@@ -166,6 +168,48 @@ void ECTextDocument ::AddNewLine(int row, int col)
     }
 
     SendToView(curY, curX, pageIndex);
+}
+
+std::vector<std::string> ECTextDocument ::GetLinesFromFile()
+{
+    // open the file
+    ifstream src;
+    src.open(fName);
+
+    // list of lines & current line
+    vector<string> lines;
+    string cur;
+
+    // check to see if the file exists
+    if (!src)
+    {
+        ofstream f(fName);
+        f.close();
+    }
+    else
+    {
+        while (getline(src, cur))
+        {
+            lines.push_back(cur);
+        }
+
+        src.close();
+    }
+
+    // return the lines
+    return lines;
+}
+
+void ECTextDocument ::SetLinesInFile()
+{
+    ofstream file(fName);
+
+    for (int i = 0; i < listRows.size(); i++)
+    {
+        file << listRows[i] << endl;
+    }
+
+    file.close();
 }
 
 //-------------------------------------------------------------

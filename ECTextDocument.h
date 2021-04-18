@@ -82,7 +82,7 @@ class ECTextDocument
 {
 public:
     // Init
-    ECTextDocument(ECEditorView &v);
+    ECTextDocument(ECEditorView &v, std::string &fileName);
     virtual ~ECTextDocument();
 
     // Get
@@ -98,8 +98,13 @@ public:
     // View Management
     void SendToView(int row, int col, int page);
 
+    // File Management
+    std::vector<std::string> GetLinesFromFile();
+    void SetLinesInFile();
+
 private:
     ECEditorView &view;
+    std::string fName;
     std::vector<std::string> listRows;
     int pageIndex;
 };
