@@ -30,14 +30,6 @@ void ECCommandHistory ::ExecuteCmd(ECCommand *pCmd)
         position = listOfCommands.size();
         listOfCommands.push_back(pCmd);
     }
-
-    // BROKEN
-    // position = listOfCommands.size();
-    // listOfCommands.push_back(pCmd);
-    // pCmd->Execute();
-
-    // BROKEN FOR WHEN NEW COMMANDS ARE ADDED
-    // position++;
 }
 
 bool ECCommandHistory ::Undo()
@@ -60,74 +52,5 @@ bool ECCommandHistory ::Redo()
     }
     position++;
     listOfCommands[position]->ReExecute();
-    //position++;
     return true;
 }
-//----------------------------------------------------------------
-//           OLD COMMAND HISTORY
-//----------------------------------------------------------------
-
-// ECCommandHistory ::ECCommandHistory() : position(-1) {}
-
-// ECCommandHistory ::~ECCommandHistory()
-// {
-//     for (int i = 0; i < listOfCommands.size(); i++)
-//     {
-//         delete listOfCommands[i];
-//     }
-
-//     listOfCommands.clear();
-//     position = -1;
-// }
-
-// bool ECCommandHistory ::Undo()
-// {
-
-//     // check to make sure we can
-//     if (position < 0)
-//     {
-//         return false;
-//     }
-//     else if (position < listOfCommands.size())
-//     {
-//         listOfCommands[position]->UnExecute();
-//         position--;
-
-//         return true;
-//     }
-
-//     position--;
-
-//     // un execute the previous command and move position back
-//     return false;
-// }
-
-// bool ECCommandHistory ::Redo()
-// {
-//     if (position < 0)
-//     {
-//         return true;
-//     }
-//     else if (position < listOfCommands.size())
-//     {
-//         listOfCommands[position]->Execute();
-//         position++;
-
-//         return true;
-//     }
-
-//     return false;
-// }
-
-// void ECCommandHistory ::ExecuteCmd(ECCommand *pCmd)
-// {
-//     // push back and execute
-//     listOfCommands.push_back(pCmd);
-//     position++;
-//     pCmd->Execute();
-// }
-
-// void ECCommandHistory ::ExecuteMove(ECCommand *pCmd)
-// {
-//     pCmd->Execute();
-// }

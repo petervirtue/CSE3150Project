@@ -17,36 +17,30 @@ ECEditorController ::~ECEditorController() {}
 
 void ECEditorController ::Update()
 {
-
-    // Get the key pressed
+    // Get the key pressed and the location of it
     int key = view.GetKeyPressed();
     int row = view.GetCursorY();
     int col = view.GetCursorX();
 
-    // Once testing is over, this is where the KeyPressHandler will be called so that we're not doing the handline in this file
+    // Once testing is over, this is where the KeyPressHandler will be called so that we're not doing the handline in this file (TBD, switching to this method at this point would be a lot of work)
     // But for now, handle in here
 
     if (key == ENTER)
     {
         // Retuen key pressed, add new row
-        //view.Refresh();
         AddNewLine(row, col);
     }
     else if (key == CTRL_Q)
     {
-        // Control Q pressed
-        //view.Quit();
         view.Clear();
         view.Quit();
     }
     else if (key == CTRL_R)
     {
-        // CURRENTLY BROKEN
         Redo();
     }
     else if (key == CTRL_Z)
     {
-        // CURRENTLY BROKEN
         Undo();
     }
     else if (key == BACKSPACE)
@@ -73,7 +67,6 @@ void ECEditorController ::Update()
 void ECEditorController ::ShowEditor()
 {
     view.ShowView();
-    view.AddRow("ShowEditor ran");
 }
 
 void ECEditorController ::InsertCharAt(int row, int col, const char c)

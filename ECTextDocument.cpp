@@ -127,46 +127,8 @@ bool ECTextDocument ::InsertChar(char c, int row, int col, bool undoRedo)
         SendToView(row, col, pageIndex);
     }
 
-    //SendToView(curY, curX, pageIndex);
-
     // char is always going to be inserted, deletion is really what we are looking to handle
     return true;
-}
-
-void ECTextDocument ::UndoInsert(int row, int col)
-{
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    if (row < listRows.size() && col < listRows[row].size())
-    {
-        listRows[row].erase(col, 1);
-    }
-
-    CheckCursor(curY, curX);
-}
-
-void ECTextDocument ::RedoInsert(int row, int col, char c)
-{
-    // Get cursor position
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    string s = string(1, c);
-    if (listRows.size() <= row)
-    {
-        listRows.push_back(s);
-    }
-    else if (col >= listRows[row].size())
-    {
-        listRows[row].append(s);
-    }
-    else
-    {
-        listRows[row].insert(col, s);
-    }
-
-    CheckCursor(curY, curX);
 }
 
 // REMOVE
@@ -215,52 +177,6 @@ std::pair<char, int> ECTextDocument ::EraseChar(int row, int col, bool undoRedo)
     }
 
     return toRemove;
-}
-
-void ECTextDocument ::UndoErase(int row, int col, char c)
-{
-    // Get cursor position
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    string s = string(1, c);
-    if (listRows.size() <= row)
-    {
-        listRows.push_back(s);
-    }
-    else if (col - 1 >= listRows[row].size())
-    {
-        listRows[row].append(s);
-    }
-    else
-    {
-        listRows[row].insert(col - 1, s);
-    }
-
-    CheckCursor(curY, curX);
-}
-
-void ECTextDocument ::RedoErase(int row, int col)
-{
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    if (col > 0)
-    {
-        listRows[row].erase(col - 1, 1);
-    }
-    else if (row > 0)
-    {
-        string extra = listRows[row];
-        listRows.erase(listRows.begin() + row);
-        row--;
-        if (extra.size() != 0)
-        {
-            listRows[row].append(extra);
-        }
-    }
-
-    CheckCursor(curY, curX);
 }
 
 // RETURN
@@ -398,7 +314,6 @@ void ECTextDocument ::SetLinesInFile()
 
 InsertCommand ::InsertCommand(ECTextDocument &docIn, int row, int col, char charIn) : doc(docIn), rowPos(row), colPos(col), charToInsert(charIn) {}
 
-// tried doing something here and it broke, trying doing nothing
 InsertCommand ::~InsertCommand() {}
 
 bool InsertCommand ::Execute()
@@ -408,23 +323,19 @@ bool InsertCommand ::Execute()
 
 void InsertCommand ::UnExecute()
 {
-    //doc.UndoInsert(rowPos, colPos);
     doc.EraseChar(rowPos, colPos + 1, true);
 }
 
 void InsertCommand ::ReExecute()
 {
     doc.InsertChar(charToInsert, rowPos, colPos, true);
-    //doc.RedoInsert(rowPos, colPos, charToInsert);
 }
 
 //-------------------------------------------------------------
 //           REMOVE COMMAND
 //-------------------------------------------------------------
 
-RemoveCommand ::RemoveCommand(ECTextDocument &docIn, int row, int col) : doc(docIn), rowPos(row), colPos(col)
-{
-}
+RemoveCommand ::RemoveCommand(ECTextDocument &docIn, int row, int col) : doc(docIn), rowPos(row), colPos(col) {}
 
 RemoveCommand ::~RemoveCommand() {}
 
@@ -455,15 +366,12 @@ void RemoveCommand ::UnExecute()
     }
     else
     {
-        //doc.UndoErase(rowPos, colPos, charRemoved);
         doc.InsertChar(charRemoved, rowPos, colPos, true);
     }
 }
 
 void RemoveCommand ::ReExecute()
 {
-    //doc.UndoInsert(rowPos, colPos);
-    //doc.RedoErase(rowPos, colPos);
     doc.EraseChar(rowPos, colPos, true);
 }
 

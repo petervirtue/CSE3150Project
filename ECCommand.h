@@ -25,11 +25,18 @@ public:
 class ECCommandHistory
 {
 public:
+    // Init
     ECCommandHistory();
     virtual ~ECCommandHistory();
+
+    // Undo/Redo Management
     bool Undo();
     bool Redo();
+
+    // Execution
     void ExecuteCmd(ECCommand *pCmd);
+
+    // Get
     int GetSize() { return listOfCommands.size(); };
     int GetPos() { return position; };
 

@@ -98,23 +98,11 @@ public:
     bool InsertChar(char c, int row, int col, bool undoRedo);
     std::pair<char, int> EraseChar(int row, int col, bool undoRedo);
     void AddNewLine(int row, int col);
-    void MoveCursor(int direction);
-
-    // Undo/Redo Functions
-
-    // Insert
-    void UndoInsert(int row, int col);
-    void RedoInsert(int row, int col, char c);
-
-    // Remove
-    void UndoErase(int row, int col, char c);
-    void RedoErase(int row, int col);
-
-    // New Line
     void UndoNewLine(int row, int col);
     void RedoNewLine(int row, int col);
 
-    // General
+    // Cursor Management
+    void MoveCursor(int direction);
     void CheckCursor(int row, int col);
 
     // View Management
