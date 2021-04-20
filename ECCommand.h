@@ -13,8 +13,9 @@ class ECCommand
 {
 public:
     virtual ~ECCommand() {}
-    virtual void Execute() = 0;
+    virtual bool Execute() = 0;
     virtual void UnExecute() = 0;
+    virtual void ReExecute() = 0;
 };
 
 //----------------------------------------------------------------
@@ -24,20 +25,23 @@ public:
 class ECCommandHistory
 {
 public:
+    // Init
     ECCommandHistory();
     virtual ~ECCommandHistory();
+
+    // Undo/Redo Management
     bool Undo();
     bool Redo();
+
+    // Execution
     void ExecuteCmd(ECCommand *pCmd);
-    void ExecuteMove(ECCommand *pCmd);
+
+    // Get
     int GetSize() { return listOfCommands.size(); };
     int GetPos() { return position; };
 
 private:
-    // your code goes here
-
     std::vector<ECCommand *> listOfCommands;
-    std::vector<ECCommand *> listMovements;
     int position;
 };
 

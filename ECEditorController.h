@@ -12,8 +12,7 @@
 class ECEditorController : public ECObserver
 {
 public:
-    // init with Text Document & Editor View
-    //ECEditorController(ECTextDocument &td, ECEditorView &v);
+    // Init with Text Document & Editor View
     ECEditorController(ECTextDocument &td, ECEditorView &v);
     virtual ~ECEditorController();
 
@@ -22,13 +21,16 @@ public:
 
     // Get
     ECTextDocument GetDocument() { return doc; }
-    //ECEditorView GetEditorView();
 
-    // Functions
+    // Text Manipulation Command Functions
     void InsertCharAt(int row, int col, const char c);
     void RemoveCharAt(int row, int col);
     void AddNewLine(int row, int col);
+
+    // Cursor Management
     void MoveCursor(int direction);
+
+    // Undo/Redo Management
     bool Undo();
     bool Redo();
 

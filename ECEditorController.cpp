@@ -17,37 +17,31 @@ ECEditorController ::~ECEditorController() {}
 
 void ECEditorController ::Update()
 {
-
-    // Get the key pressed
+    // Get the key pressed and the location of it
     int key = view.GetKeyPressed();
     int row = view.GetCursorY();
     int col = view.GetCursorX();
 
-    // Once testing is over, this is where the KeyPressHandler will be called so that we're not doing the handline in this file
+    // Once testing is over, this is where the KeyPressHandler will be called so that we're not doing the handline in this file (TBD, switching to this method at this point would be a lot of work)
     // But for now, handle in here
 
     if (key == ENTER)
     {
         // Retuen key pressed, add new row
-        //view.Refresh();
         AddNewLine(row, col);
     }
     else if (key == CTRL_Q)
     {
-        // Control Q pressed
-        //view.Quit();
         view.Clear();
         view.Quit();
     }
     else if (key == CTRL_R)
     {
-        // CURRENTLY BROKEN
         Redo();
     }
     else if (key == CTRL_Z)
     {
-        // CURRENTLY BROKEN
-        //Undo();
+        Undo();
     }
     else if (key == BACKSPACE)
     {
@@ -66,14 +60,13 @@ void ECEditorController ::Update()
     }
 
     // DEBUG
-    // view.status = "position: " + to_string(histCmds.GetPos()) + " | histCmds size: " + to_string(histCmds.GetSize());
+    //view.status = "position: " + to_string(histCmds.GetPos()) + " | histCmds size: " + to_string(histCmds.GetSize());
     //view.Refresh();
 }
 
 void ECEditorController ::ShowEditor()
 {
     view.ShowView();
-    view.AddRow("ShowEditor ran");
 }
 
 void ECEditorController ::InsertCharAt(int row, int col, const char c)
@@ -91,7 +84,7 @@ void ECEditorController ::RemoveCharAt(int row, int col)
 void ECEditorController ::MoveCursor(int direction)
 {
     ArrowCommand *ac = new ArrowCommand(this->doc, direction);
-    histCmds.ExecuteMove(ac);
+    histCmds.ExecuteCmd(ac);
 }
 
 void ECEditorController ::AddNewLine(int row, int col)
@@ -102,20 +95,10 @@ void ECEditorController ::AddNewLine(int row, int col)
 
 bool ECEditorController ::Undo()
 {
-    if (histCmds.GetPos() > 0)
-    {
-        return histCmds.Undo();
-    }
-
-    return false;
+    return histCmds.Undo();
 }
 
 bool ECEditorController ::Redo()
 {
-    if (histCmds.GetPos() <= histCmds.GetSize())
-    {
-        return histCmds.Redo();
-    }
-
-    return false;
+    return histCmds.Redo();
 }
