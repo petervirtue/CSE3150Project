@@ -22,7 +22,6 @@ public:
 
     // Get
     ECTextDocument GetDocument() { return doc; }
-    //ECEditorView GetEditorView();
 
     // Functions
     void InsertCharAt(int row, int col, const char c);

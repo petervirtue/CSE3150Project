@@ -20,8 +20,9 @@ class InsertCommand : public ECCommand
 public:
     InsertCommand(ECTextDocument &docIn, int row, int col, char charIn);
     ~InsertCommand();
-    void Execute();
+    bool Execute();
     void UnExecute();
+    void ReExecute();
 
 private:
     ECTextDocument &doc;
@@ -36,13 +37,15 @@ class RemoveCommand : public ECCommand
 public:
     RemoveCommand(ECTextDocument &docIn, int row, int col);
     ~RemoveCommand();
-    void Execute();
+    bool Execute();
     void UnExecute();
+    void ReExecute();
 
 private:
     ECTextDocument &doc;
     int rowPos;
     int colPos;
+    int delX;
     char charRemoved;
 };
 
@@ -52,8 +55,9 @@ class EnterCommand : public ECCommand
 public:
     EnterCommand(ECTextDocument &docIn, int row, int col);
     ~EnterCommand();
-    void Execute();
+    bool Execute();
     void UnExecute();
+    void ReExecute();
 
 private:
     ECTextDocument &doc;
@@ -66,8 +70,9 @@ class ArrowCommand : public ECCommand
 public:
     ArrowCommand(ECTextDocument &docIn, int key);
     ~ArrowCommand();
-    void Execute();
-    void UnExecute();
+    bool Execute();
+    void UnExecute(){};
+    void ReExecute(){};
 
 private:
     ECTextDocument &doc;
@@ -90,10 +95,27 @@ public:
     ECEditorView GetEditorView();
 
     // Text Manipulation
-    void InsertChar(char c, int row, int col);
-    char EraseChar(int row, int col);
+    bool InsertChar(char c, int row, int col, bool undoRedo);
+    std::pair<char, int> EraseChar(int row, int col, bool undoRedo);
     void AddNewLine(int row, int col);
     void MoveCursor(int direction);
+
+    // Undo/Redo Functions
+
+    // Insert
+    void UndoInsert(int row, int col);
+    void RedoInsert(int row, int col, char c);
+
+    // Remove
+    void UndoErase(int row, int col, char c);
+    void RedoErase(int row, int col);
+
+    // New Line
+    void UndoNewLine(int row, int col);
+    void RedoNewLine(int row, int col);
+
+    // General
+    void CheckCursor(int row, int col);
 
     // View Management
     void SendToView(int row, int col, int page);

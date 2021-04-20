@@ -47,7 +47,7 @@ void ECEditorController ::Update()
     else if (key == CTRL_Z)
     {
         // CURRENTLY BROKEN
-        //Undo();
+        Undo();
     }
     else if (key == BACKSPACE)
     {
@@ -66,7 +66,7 @@ void ECEditorController ::Update()
     }
 
     // DEBUG
-    // view.status = "position: " + to_string(histCmds.GetPos()) + " | histCmds size: " + to_string(histCmds.GetSize());
+    //view.status = "position: " + to_string(histCmds.GetPos()) + " | histCmds size: " + to_string(histCmds.GetSize());
     //view.Refresh();
 }
 
@@ -91,7 +91,7 @@ void ECEditorController ::RemoveCharAt(int row, int col)
 void ECEditorController ::MoveCursor(int direction)
 {
     ArrowCommand *ac = new ArrowCommand(this->doc, direction);
-    histCmds.ExecuteMove(ac);
+    histCmds.ExecuteCmd(ac);
 }
 
 void ECEditorController ::AddNewLine(int row, int col)
@@ -102,20 +102,10 @@ void ECEditorController ::AddNewLine(int row, int col)
 
 bool ECEditorController ::Undo()
 {
-    if (histCmds.GetPos() > 0)
-    {
-        return histCmds.Undo();
-    }
-
-    return false;
+    return histCmds.Undo();
 }
 
 bool ECEditorController ::Redo()
 {
-    if (histCmds.GetPos() <= histCmds.GetSize())
-    {
-        return histCmds.Redo();
-    }
-
-    return false;
+    return histCmds.Redo();
 }
