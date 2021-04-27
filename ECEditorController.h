@@ -9,6 +9,14 @@
 //           EDITOR CONTROLLER
 //----------------------------------------------------------------
 
+// Editing Mode Enum
+
+enum EDITING_MODE
+{
+    EDITING = 0,
+    FIND = 1,
+    REPLACE = 2,
+};
 class ECEditorController : public ECObserver
 {
 public:
@@ -44,6 +52,9 @@ private:
 
     // Command History
     ECCommandHistory histCmds;
+
+    // Editing Mode
+    int editMode;
 };
 
 #endif
