@@ -5,6 +5,7 @@
 #include "ECCommand.h"
 #include "ECEditorView.h"
 
+#include <utility>
 #include <vector>
 #include <string>
 
@@ -79,6 +80,22 @@ private:
     int arrowKey;
 };
 
+class ReplaceCommand : public ECCommand
+{
+public:
+    ReplaceCommand(ECTextDocument &docIn);
+    ~ReplaceCommand();
+    bool Execute();
+    void UnExecute();
+    void ReExecute();
+
+private:
+    ECTextDocument &doc;
+    std::string toReplace;
+    std::string replacedWith;
+    std::vector<std::pair<int, int> > locations;
+};
+
 //----------------------------------------------------------------
 //           TEXT DOCUMENT
 //----------------------------------------------------------------
@@ -105,6 +122,23 @@ public:
     void MoveCursor(int direction);
     void CheckCursor(int row, int col);
 
+    // Editing Mode
+    void EnterEditingMode();
+
+    // Search Mode
+    void EnterSearchMode();
+    void AddSearchChar(char c);
+    void RemoveSearchChar();
+    void ExecuteSearch();
+
+    // Replace Mode
+    void EnterReplaceMode();
+    void AddReplaceChar(char c);
+    void RemoveReplaceChar();
+    std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string> > ExecuteReplace();
+    void UndoReplace(std::vector<std::pair<int, int> > locs, std::string replacedWith, std::string old);
+    std::vector<std::pair<int, int> > RedoReplace(std::string toReplace, std::string replacedWith);
+
     // View Management
     void SendToView(int row, int col, int page);
 
@@ -113,9 +147,21 @@ public:
     void SetLinesInFile();
 
 private:
+    // View
     ECEditorView &view;
+
+    // File name
     std::string fName;
+
+    // Rows & page index
     std::vector<std::string> listRows;
     int pageIndex;
+
+    // Mode
+    int editMode;
+
+    // Search & Replace Strings
+    std::string search;
+    std::string replace;
 };
 #endif

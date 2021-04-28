@@ -61,7 +61,34 @@ void ECEditorView ::AttachController(ECObserver *ob)
     tvimp.Attach(ob);
 }
 
-void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col, std::string fName)
+void ECEditorView ::AddColoredRow(std::vector<int> c)
+{
+    searchWords.push_back(c);
+}
+
+void ECEditorView ::SetColoredRows()
+{
+    for (int i = 0; i < searchWords.size(); i++)
+    {
+        tvimp.SetColor(searchWords[i][0], searchWords[i][1], searchWords[i][2], TEXT_COLOR_RED);
+    }
+}
+
+void ECEditorView ::ClearColoredRows()
+{
+
+    // Set old rows back to white
+    for (int i = 0; i < searchWords.size(); i++)
+    {
+        tvimp.SetColor(searchWords[i][0], searchWords[i][1], searchWords[i][2], TEXT_COLOR_WHITE);
+    }
+
+
+    // Clear rows
+    searchWords.clear();
+}
+
+void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col, std::string fName, int eMode, std::string find)
 {
     // cursor handling
     curX = col;
@@ -89,10 +116,28 @@ void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col, std::s
     tvimp.SetCursorX(curX);
     tvimp.SetCursorY(pageY);
 
-    string left = "Editing " + fName + " - Line " + to_string(curY + 1) + " - Page " + to_string(page + 1);
+    // Change the status bar based on mode
 
+    string left = "Editing " + fName + " - Line " + to_string(curY + 1) + " - Page " + to_string(page + 1);
+    string right = "Peter Virtue - CSE 3150";
+    bool light = false;
+
+    if (eMode == 1)
+    {
+        left = "SEARCH: " + find;
+        light = true;
+        SetColoredRows();
+    }
+    else if (eMode == 2)
+    {
+        left = "REPLACE WITH: " + find;
+        light = true;
+        SetColoredRows();
+    }
+
+    // Set the status rows
     tvimp.ClearStatusRows();
-    tvimp.AddStatusRow(left, "Peter Virtue - CSE 3150", false);
+    tvimp.AddStatusRow(left, right, light);
 
     // DEBUG
     //tvimp.AddStatusRow(status, " ", false);
