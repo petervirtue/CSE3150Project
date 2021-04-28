@@ -105,7 +105,7 @@ void ECEditorController ::Update()
         {
             MoveCursor(key);
         }
-        else
+        else if (key != ESC)
         {
             // Any other key pressed
 
