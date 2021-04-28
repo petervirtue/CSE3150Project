@@ -57,6 +57,9 @@ void ECTextDocument ::EnterEditingMode()
     search = "";
     replace = "";
 
+    // Clear colored lines
+    view.ClearColoredRows();
+
     // Send to View
     SendToView(curY, curX, pageIndex);
 }
@@ -71,6 +74,13 @@ void ECTextDocument ::EnterSearchMode()
 
     // Search Mode Enter
     editMode = 1;
+
+    // Set replace to search incase we are coming from a replace
+    search = replace;
+    replace = "";
+
+    // Highlight and send search if there is a predefined search
+    ExecuteSearch();
 
     // Send to View
     SendToView(curY, curX, pageIndex);
@@ -125,7 +135,7 @@ void ECTextDocument ::ExecuteSearch()
             {
                 if (listRows[i].substr(j, search.size()) == search)
                 {
-                    int s = search.size();
+                    int s = search.size() - 1;
                     vector<int> v;
                     v.push_back(i);
                     v.push_back(j);
@@ -149,6 +159,7 @@ void ECTextDocument ::EnterReplaceMode()
     int curY = view.GetCursorY();
 
     // Search Mode Enter
+    replace = "";
     editMode = 2;
 
     // Send to View
@@ -179,7 +190,7 @@ void ECTextDocument ::RemoveReplaceChar()
     // Remove the char
     if (replace.size() > 0)
     {
-        replace.erase(search.size() - 1, 1);
+        replace.erase(replace.size() - 1, 1);
     }
 
     // Send to View
@@ -212,13 +223,21 @@ std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string
             {
                 if (listRows[i].substr(j, search.size()) == search)
                 {
-
-                    int s = search.size();
+                    // Send Location to the vector
                     std::pair<int, int> loc;
                     loc.first = i;
                     loc.second = j;
                     locs.push_back(loc);
-                    listRows[i].replace(j, replace.size(), replace);
+
+                    // Replace by using erase and insert instead of replace
+
+                    // OLD
+                    // listRows[i].replace(j, replace.size(), replace);
+                    // j = j + replace.size();
+
+                    // NEW
+                    listRows[i].erase(j, search.size());
+                    listRows[i].insert(j, replace);
                     j = j + replace.size();
                 }
             }
@@ -226,7 +245,8 @@ std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string
     }
 
     // Send to View
-    SendToView(curY, curX, pageIndex);
+    CheckCursor(curY, curX);
+    //SendToView(curY, curX, pageIndex);
 
     // Return Data
     std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string> > ret;
@@ -243,13 +263,19 @@ void ECTextDocument ::UndoReplace(std::vector<std::pair<int, int> > locs, std::s
     int curY = view.GetCursorY();
 
     // Have to go backwards to account for locations being put in forward order
-    for (int i = locs.size(); i >= 0; i--)
+    for (int i = locs.size() - 1; i >= 0; i--)
     {
-        listRows[locs[i].first].replace(locs[i].second, replacedWith.size(), old);
+        // OLD
+        //listRows[locs[i].first].replace(locs[i].second, replacedWith.size(), old);
+
+        // NEW
+        listRows[locs[i].first].erase(locs[i].second, replacedWith.size());
+        listRows[locs[i].first].insert(locs[i].second, old);
     }
 
     // Send to View
-    SendToView(curY, curX, pageIndex);
+    CheckCursor(curY, curX);
+    //SendToView(curY, curX, pageIndex);
 }
 
 std::vector<std::pair<int, int> > ECTextDocument ::RedoReplace(std::string toReplace, std::string replacedWith)
@@ -275,12 +301,21 @@ std::vector<std::pair<int, int> > ECTextDocument ::RedoReplace(std::string toRep
                 if (listRows[i].substr(j, toReplace.size()) == toReplace)
                 {
 
-                    int s = toReplace.size();
+                    // Send Location to the vector
                     std::pair<int, int> loc;
                     loc.first = i;
                     loc.second = j;
                     locs.push_back(loc);
-                    listRows[i].replace(j, replacedWith.size(), replacedWith);
+
+                    // Replace by using erase and insert instead of replace
+
+                    // OLD
+                    // listRows[i].replace(j, replace.size(), replace);
+                    // j = j + replace.size();
+
+                    // NEW
+                    listRows[i].erase(j, toReplace.size());
+                    listRows[i].insert(j, replacedWith);
                     j = j + replacedWith.size();
                 }
             }
@@ -288,7 +323,7 @@ std::vector<std::pair<int, int> > ECTextDocument ::RedoReplace(std::string toRep
     }
 
     // Send to View
-    SendToView(curY, curX, pageIndex);
+    CheckCursor(curY, curX);
 
     // Return Data
     return locs;

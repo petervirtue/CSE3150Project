@@ -45,7 +45,7 @@ void ECEditorController ::Update()
         {
             EnterReplaceMode();
         }
-        else if (key != ARROW_DOWN || key != ARROW_UP || key != ARROW_LEFT || key != ARROW_RIGHT)
+        else if (key != ARROW_DOWN && key != ARROW_UP && key != ARROW_LEFT && key != ARROW_RIGHT)
         {
             char toInsert = char(key);
             AddSearchChar(toInsert);
@@ -66,7 +66,7 @@ void ECEditorController ::Update()
         {
             SendReplace();
         }
-        else if (key != ARROW_DOWN || key != ARROW_UP || key != ARROW_LEFT || key != ARROW_RIGHT)
+        else if (key != ARROW_DOWN && key != ARROW_UP && key != ARROW_LEFT && key != ARROW_RIGHT)
         {
             char toInsert = char(key);
             AddReplaceChar(toInsert);
@@ -178,7 +178,8 @@ void ECEditorController ::SendReplace()
     ReplaceCommand *rc = new ReplaceCommand(this->doc);
     histCmds.ExecuteCmd(rc);
 
-    EnterEditingMode();
+    //EnterEditingMode();
+    EnterSearchMode();
 }
 
 void ECEditorController ::ShowEditor()
