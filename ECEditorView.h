@@ -29,8 +29,13 @@ public:
     // Row management
     void AddRow(std::string row);
     void RemoveRow(int row);
-    void SetRows(std::vector<std::string> rowsIn, int row, int col, std::string fName);
+    void SetRows(std::vector<std::string> rowsIn, int row, int col, std::string fName, int eMode, std::string find);
 
+    // Colored Rows
+    void SetColoredRows();
+    void AddColoredRow(std::vector<int> c);
+    void ClearColoredRows();
+    
     // Get Key pressed
     int GetKeyPressed();
 
@@ -47,6 +52,7 @@ private:
     int curY;
     int pageY;
     int pageIndex;
+    std::vector<std::vector<int> > searchWords;
 };
 
 #endif

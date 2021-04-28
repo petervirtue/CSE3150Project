@@ -9,6 +9,15 @@
 //           EDITOR CONTROLLER
 //----------------------------------------------------------------
 
+// Editing Mode Enum
+
+enum EDITING_MODE
+{
+    EDITING = 0,
+    FIND = 1,
+    REPLACE = 2,
+};
+
 class ECEditorController : public ECObserver
 {
 public:
@@ -30,6 +39,22 @@ public:
     // Cursor Management
     void MoveCursor(int direction);
 
+    // Search/Replace Mode Changing
+
+    void EnterEditingMode();
+
+    // Replace Mode
+    void EnterReplaceMode();
+    void AddReplaceChar(const char c);
+    void RemoveReplaceChar();
+    void SendReplace();
+
+    // Search Mode
+    void EnterSearchMode();
+    void AddSearchChar(const char c);
+    void RemoveSearchChar();
+    void SendSearch();
+
     // Undo/Redo Management
     bool Undo();
     bool Redo();
@@ -44,6 +69,9 @@ private:
 
     // Command History
     ECCommandHistory histCmds;
+
+    // Editing Mode
+    int editMode;
 };
 
 #endif
