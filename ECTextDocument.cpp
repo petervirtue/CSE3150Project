@@ -30,6 +30,10 @@ ECTextDocument ::ECTextDocument(ECEditorView &v, std::string &fileName) : view(v
 
 ECTextDocument ::~ECTextDocument() {}
 
+//----------------------------------------------------------------
+//           GENERAL FUNCTIONALITY
+//----------------------------------------------------------------
+
 void ECTextDocument ::SendToView(int row, int col, int page)
 {
     SetLinesInFile();
@@ -45,6 +49,10 @@ void ECTextDocument ::SendToView(int row, int col, int page)
 
     view.SetRows(listRows, row, col, fName, editMode, find);
 }
+
+//----------------------------------------------------------------
+//           EDITING MODE
+//----------------------------------------------------------------
 
 void ECTextDocument ::EnterEditingMode()
 {
@@ -62,271 +70,6 @@ void ECTextDocument ::EnterEditingMode()
 
     // Send to View
     SendToView(curY, curX, pageIndex);
-}
-
-// SEARCH
-
-void ECTextDocument ::EnterSearchMode()
-{
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Search Mode Enter
-    editMode = 1;
-
-    // Set replace to search incase we are coming from a replace
-    search = replace;
-    replace = "";
-
-    // Highlight and send search if there is a predefined search
-    ExecuteSearch();
-
-    // Send to View
-    SendToView(curY, curX, pageIndex);
-}
-
-void ECTextDocument ::AddSearchChar(char c)
-{
-
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Add the string
-    string s = string(1, c);
-    search.append(s);
-
-    // Send to View
-    SendToView(curY, curX, pageIndex);
-}
-
-void ECTextDocument ::RemoveSearchChar()
-{
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Remove the char
-    if (search.size() > 0)
-    {
-        search.erase(search.size() - 1, 1);
-    }
-
-    // Send to View
-    SendToView(curY, curX, pageIndex);
-}
-
-void ECTextDocument ::ExecuteSearch()
-{
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Clear rows first
-    view.ClearColoredRows();
-
-    // Find the occurrences
-    if (search.size() != 0)
-    {
-        for (int i = 0; i < listRows.size(); i++)
-        {
-            for (int j = 0; j < listRows[i].size(); j++)
-            {
-                if (listRows[i].substr(j, search.size()) == search)
-                {
-                    int s = search.size() - 1;
-                    vector<int> v;
-                    v.push_back(i);
-                    v.push_back(j);
-                    v.push_back(j + s);
-                    view.AddColoredRow(v);
-                }
-            }
-        }
-    }
-
-    // Send to View
-    SendToView(curY, curX, pageIndex);
-}
-
-// REPLACE
-
-void ECTextDocument ::EnterReplaceMode()
-{
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Search Mode Enter
-    replace = "";
-    editMode = 2;
-
-    // Send to View
-    SendToView(curY, curX, pageIndex);
-}
-
-void ECTextDocument ::AddReplaceChar(char c)
-{
-
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Add the string
-    string s = string(1, c);
-    replace.append(s);
-
-    // Send to View
-    SendToView(curY, curX, pageIndex);
-}
-
-void ECTextDocument ::RemoveReplaceChar()
-{
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Remove the char
-    if (replace.size() > 0)
-    {
-        replace.erase(replace.size() - 1, 1);
-    }
-
-    // Send to View
-    SendToView(curY, curX, pageIndex);
-}
-
-std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string> > ECTextDocument ::ExecuteReplace()
-{
-
-    // Return Format - PAIR(VECTOR[PAIR <ROW, COL>], PAIR<replaceWith, toReplace>)
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Clear rows first
-    view.ClearColoredRows();
-
-    // Populate Return Data
-    vector<std::pair<int, int> > locs;
-    std::pair<string, string> reps;
-    reps.first = replace;
-    reps.second = search;
-
-    // Find the occurrences and add locations, need to do a second double loop in order to make sure replaces work fine
-    if (search.size() != 0)
-    {
-        for (int i = 0; i < listRows.size(); i++)
-        {
-            for (int j = 0; j < listRows[i].size(); j++)
-            {
-                if (listRows[i].substr(j, search.size()) == search)
-                {
-                    // Send Location to the vector
-                    std::pair<int, int> loc;
-                    loc.first = i;
-                    loc.second = j;
-                    locs.push_back(loc);
-
-                    // Replace by using erase and insert instead of replace
-
-                    // OLD
-                    // listRows[i].replace(j, replace.size(), replace);
-                    // j = j + replace.size();
-
-                    // NEW
-                    listRows[i].erase(j, search.size());
-                    listRows[i].insert(j, replace);
-                    j = j + replace.size();
-                }
-            }
-        }
-    }
-
-    // Send to View
-    CheckCursor(curY, curX);
-    //SendToView(curY, curX, pageIndex);
-
-    // Return Data
-    std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string> > ret;
-    ret.first = locs;
-    ret.second = reps;
-    return ret;
-}
-
-void ECTextDocument ::UndoReplace(std::vector<std::pair<int, int> > locs, std::string replacedWith, std::string old)
-{
-    // Return Format - PAIR(VECTOR[PAIR <ROW, COL>], PAIR<replaceWith, toReplace>)
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Have to go backwards to account for locations being put in forward order
-    for (int i = locs.size() - 1; i >= 0; i--)
-    {
-        // OLD
-        //listRows[locs[i].first].replace(locs[i].second, replacedWith.size(), old);
-
-        // NEW
-        listRows[locs[i].first].erase(locs[i].second, replacedWith.size());
-        listRows[locs[i].first].insert(locs[i].second, old);
-    }
-
-    // Send to View
-    CheckCursor(curY, curX);
-    //SendToView(curY, curX, pageIndex);
-}
-
-std::vector<std::pair<int, int> > ECTextDocument ::RedoReplace(std::string toReplace, std::string replacedWith)
-{
-    // Return Format - PAIR(VECTOR[PAIR <ROW, COL>]
-    // Cursor
-    int curX = view.GetCursorX();
-    int curY = view.GetCursorY();
-
-    // Clear rows first
-    view.ClearColoredRows();
-
-    // Populate Return Data
-    vector<std::pair<int, int> > locs;
-
-    // Find the occurrences and add locations, need to do a second double loop in order to make sure replaces work fine
-    if (toReplace.size() != 0)
-    {
-        for (int i = 0; i < listRows.size(); i++)
-        {
-            for (int j = 0; j < listRows[i].size(); j++)
-            {
-                if (listRows[i].substr(j, toReplace.size()) == toReplace)
-                {
-
-                    // Send Location to the vector
-                    std::pair<int, int> loc;
-                    loc.first = i;
-                    loc.second = j;
-                    locs.push_back(loc);
-
-                    // Replace by using erase and insert instead of replace
-
-                    // OLD
-                    // listRows[i].replace(j, replace.size(), replace);
-                    // j = j + replace.size();
-
-                    // NEW
-                    listRows[i].erase(j, toReplace.size());
-                    listRows[i].insert(j, replacedWith);
-                    j = j + replacedWith.size();
-                }
-            }
-        }
-    }
-
-    // Send to View
-    CheckCursor(curY, curX);
-
-    // Return Data
-    return locs;
 }
 
 // MOVE ARROWS
@@ -609,6 +352,258 @@ void ECTextDocument ::SetLinesInFile()
     file.close();
 }
 
+//----------------------------------------------------------------
+//           SEARCH MODE
+//----------------------------------------------------------------
+
+void ECTextDocument ::EnterSearchMode()
+{
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Search Mode Enter
+    editMode = 1;
+
+    // Set replace to search incase we are coming from a replace
+    search = replace;
+    replace = "";
+
+    // Highlight and send search if there is a predefined search
+    ExecuteSearch();
+
+    // Send to View
+    SendToView(curY, curX, pageIndex);
+}
+
+void ECTextDocument ::AddSearchChar(char c)
+{
+
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Add the string
+    string s = string(1, c);
+    search.append(s);
+
+    // Send to View
+    SendToView(curY, curX, pageIndex);
+}
+
+void ECTextDocument ::RemoveSearchChar()
+{
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Remove the char
+    if (search.size() > 0)
+    {
+        search.erase(search.size() - 1, 1);
+    }
+
+    // Send to View
+    SendToView(curY, curX, pageIndex);
+}
+
+void ECTextDocument ::ExecuteSearch()
+{
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Clear rows first
+    view.ClearColoredRows();
+
+    // Find the occurrences
+    if (search.size() != 0)
+    {
+        for (int i = 0; i < listRows.size(); i++)
+        {
+            for (int j = 0; j < listRows[i].size(); j++)
+            {
+                if (listRows[i].substr(j, search.size()) == search)
+                {
+                    int s = search.size() - 1;
+                    vector<int> v;
+                    v.push_back(i);
+                    v.push_back(j);
+                    v.push_back(j + s);
+                    view.AddColoredRow(v);
+                }
+            }
+        }
+    }
+
+    // Send to View
+    SendToView(curY, curX, pageIndex);
+}
+
+//----------------------------------------------------------------
+//           REPLACE MODE
+//----------------------------------------------------------------
+
+void ECTextDocument ::EnterReplaceMode()
+{
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Search Mode Enter
+    replace = "";
+    editMode = 2;
+
+    // Send to View
+    SendToView(curY, curX, pageIndex);
+}
+
+void ECTextDocument ::AddReplaceChar(char c)
+{
+
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Add the string
+    string s = string(1, c);
+    replace.append(s);
+
+    // Send to View
+    SendToView(curY, curX, pageIndex);
+}
+
+void ECTextDocument ::RemoveReplaceChar()
+{
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Remove the char
+    if (replace.size() > 0)
+    {
+        replace.erase(replace.size() - 1, 1);
+    }
+
+    // Send to View
+    SendToView(curY, curX, pageIndex);
+}
+
+std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string> > ECTextDocument ::ExecuteReplace()
+{
+
+    // Return Format - PAIR(VECTOR[PAIR <ROW, COL>], PAIR<replaceWith, toReplace>)
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Clear rows first
+    view.ClearColoredRows();
+
+    // Populate Return Data
+    vector<std::pair<int, int> > locs;
+    std::pair<string, string> reps;
+    reps.first = replace;
+    reps.second = search;
+
+    // Find the occurrences and add locations, need to do a second double loop in order to make sure replaces work fine
+    if (search.size() != 0)
+    {
+        for (int i = 0; i < listRows.size(); i++)
+        {
+            for (int j = 0; j < listRows[i].size(); j++)
+            {
+                if (listRows[i].substr(j, search.size()) == search)
+                {
+                    // Send Location to the vector
+                    std::pair<int, int> loc;
+                    loc.first = i;
+                    loc.second = j;
+                    locs.push_back(loc);
+
+                    // Replace by using erase and insert instead of replace
+                    listRows[i].erase(j, search.size());
+                    listRows[i].insert(j, replace);
+                    j = j + replace.size();
+                }
+            }
+        }
+    }
+
+    // Send to View
+    CheckCursor(curY, curX);
+
+    // Return Data
+    std::pair<std::vector<std::pair<int, int> >, std::pair <std::string, std::string> > ret;
+    ret.first = locs;
+    ret.second = reps;
+    return ret;
+}
+
+void ECTextDocument ::UndoReplace(std::vector<std::pair<int, int> > locs, std::string replacedWith, std::string old)
+{
+    // Return Format - PAIR(VECTOR[PAIR <ROW, COL>], PAIR<replaceWith, toReplace>)
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Have to go backwards to account for locations being put in forward order
+    for (int i = locs.size() - 1; i >= 0; i--)
+    {
+        // Replace
+        listRows[locs[i].first].erase(locs[i].second, replacedWith.size());
+        listRows[locs[i].first].insert(locs[i].second, old);
+    }
+
+    // Send to View
+    CheckCursor(curY, curX);
+}
+
+std::vector<std::pair<int, int> > ECTextDocument ::RedoReplace(std::string toReplace, std::string replacedWith)
+{
+    // Return Format - PAIR(VECTOR[PAIR <ROW, COL>]
+    // Cursor
+    int curX = view.GetCursorX();
+    int curY = view.GetCursorY();
+
+    // Clear rows first
+    view.ClearColoredRows();
+
+    // Populate Return Data
+    vector<std::pair<int, int> > locs;
+
+    // Find the occurrences and add locations, need to do a second double loop in order to make sure replaces work fine
+    if (toReplace.size() != 0)
+    {
+        for (int i = 0; i < listRows.size(); i++)
+        {
+            for (int j = 0; j < listRows[i].size(); j++)
+            {
+                if (listRows[i].substr(j, toReplace.size()) == toReplace)
+                {
+
+                    // Send Location to the vector
+                    std::pair<int, int> loc;
+                    loc.first = i;
+                    loc.second = j;
+                    locs.push_back(loc);
+
+                    // Replace by using erase and insert instead of replace
+                    listRows[i].erase(j, toReplace.size());
+                    listRows[i].insert(j, replacedWith);
+                    j = j + replacedWith.size();
+                }
+            }
+        }
+    }
+
+    // Send to View
+    CheckCursor(curY, curX);
+
+    // Return Data
+    return locs;
+}
+
 //-------------------------------------------------------------
 //           INSERT COMMAND
 //-------------------------------------------------------------
@@ -660,7 +655,6 @@ bool RemoveCommand ::Execute()
 
 void RemoveCommand ::UnExecute()
 {
-    //doc.InsertChar(charRemoved, rowPos, colPos);
     if (delX != -1)
     {
         doc.RedoNewLine(rowPos - 1, delX);
@@ -715,7 +709,7 @@ void EnterCommand ::ReExecute()
 }
 
 //-------------------------------------------------------------
-//           RETURN COMMAND
+//           REPLACE COMMAND
 //-------------------------------------------------------------
 
 ReplaceCommand ::ReplaceCommand(ECTextDocument &docIn) : doc(docIn) {}
@@ -734,11 +728,9 @@ bool ReplaceCommand ::Execute()
 void ReplaceCommand ::UnExecute()
 {
     doc.UndoReplace(locations, replacedWith, toReplace);
-    //doc.UndoNewLine(rowPos, colPos);
 }
 
 void ReplaceCommand ::ReExecute()
 {
     locations = doc.RedoReplace(toReplace, replacedWith);
-    //doc.RedoNewLine(rowPos, colPos);
 }

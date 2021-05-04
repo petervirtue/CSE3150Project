@@ -16,6 +16,10 @@ ECEditorView ::ECEditorView(ECTextViewImp &imp) : tvimp(imp)
 
 ECEditorView ::~ECEditorView() {}
 
+//----------------------------------------------------------------
+//           GENERAL FUNCTIONALITY
+//----------------------------------------------------------------
+
 void ECEditorView ::ShowView()
 {
     tvimp.Show();
@@ -24,11 +28,6 @@ void ECEditorView ::ShowView()
 void ECEditorView ::Quit()
 {
     tvimp.Quit();
-}
-
-void ECEditorView ::AddRow(string row)
-{
-    tvimp.AddRow(row);
 }
 
 int ECEditorView ::GetKeyPressed()
@@ -61,6 +60,10 @@ void ECEditorView ::AttachController(ECObserver *ob)
     tvimp.Attach(ob);
 }
 
+//----------------------------------------------------------------
+//           COLORED ROWS
+//----------------------------------------------------------------
+
 void ECEditorView ::AddColoredRow(std::vector<int> c)
 {
     searchWords.push_back(c);
@@ -86,6 +89,15 @@ void ECEditorView ::ClearColoredRows()
 
     // Clear rows
     searchWords.clear();
+}
+
+//----------------------------------------------------------------
+//           ROW HANDLING
+//----------------------------------------------------------------
+
+void ECEditorView ::AddRow(string row)
+{
+    tvimp.AddRow(row);
 }
 
 void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col, std::string fName, int eMode, std::string find)
@@ -138,11 +150,6 @@ void ECEditorView ::SetRows(std::vector<string> rowsIn, int row, int col, std::s
     // Set the status rows
     tvimp.ClearStatusRows();
     tvimp.AddStatusRow(left, right, light);
-
-    // DEBUG
-    //tvimp.AddStatusRow(status, " ", false);
-    //string testing = "page = " + to_string(page) + " | curY = " + to_string(curY) + " | pageY = " + to_string(pageY) + " | start = " + to_string(start) + " | end = " + to_string(end);
-    //tvimp.AddStatusRow(testing, "", false);
 
     tvimp.Refresh();
 }

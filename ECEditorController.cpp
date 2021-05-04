@@ -23,9 +23,7 @@ void ECEditorController ::Update()
     int row = view.GetCursorY();
     int col = view.GetCursorX();
 
-    // Once testing is over, this is where the KeyPressHandler will be called so that we're not doing the handline in this file (TBD, switching to this method at this point would be a lot of work)
-    // But for now, handle in here
-
+    // Chain of logic that handles Key presses
     if (editMode == FIND)
     {
         // Find mode controlling
@@ -77,7 +75,6 @@ void ECEditorController ::Update()
         // Editing Mode Controlling
         if (key == ENTER)
         {
-            // Retuen key pressed, add new row
             AddNewLine(row, col);
         }
         else if (key == CTRL_Q)
@@ -108,83 +105,20 @@ void ECEditorController ::Update()
         else if (key != ESC)
         {
             // Any other key pressed
-
             char toInsert = char(key);
             InsertCharAt(row, col, toInsert);
         }
     }
-
-    // DEBUG
-    //view.status = "position: " + to_string(histCmds.GetPos()) + " | histCmds size: " + to_string(histCmds.GetSize());
-    //view.Refresh();
 }
 
-// EDITING MODE
+//----------------------------------------------------------------
+//           EDITING MODE
+//----------------------------------------------------------------
 
 void ECEditorController ::EnterEditingMode()
 {
     editMode = EDITING;
     doc.EnterEditingMode();
-}
-
-// SEARCH MODE
-
-void ECEditorController ::EnterSearchMode()
-{
-    editMode = FIND;
-    doc.EnterSearchMode();
-    // Document Enter Search Mode
-}
-
-void ECEditorController ::AddSearchChar(const char c)
-{
-    // Document Add Search Char
-    doc.AddSearchChar(c);
-}
-
-void ECEditorController ::RemoveSearchChar()
-{
-    // Document Remove Search Char
-    doc.RemoveSearchChar();
-}
-
-void ECEditorController ::SendSearch()
-{
-    // Document Send Search
-    doc.ExecuteSearch();
-}
-
-// REPLACE MODE
-
-void ECEditorController ::EnterReplaceMode()
-{
-    editMode = REPLACE;
-    doc.EnterReplaceMode();
-    // Document Enter Replace Mode
-}
-
-void ECEditorController ::AddReplaceChar(const char c)
-{
-    doc.AddReplaceChar(c);
-}
-
-void ECEditorController ::RemoveReplaceChar()
-{
-    doc.RemoveReplaceChar();
-}
-
-void ECEditorController ::SendReplace()
-{
-    ReplaceCommand *rc = new ReplaceCommand(this->doc);
-    histCmds.ExecuteCmd(rc);
-
-    //EnterEditingMode();
-    EnterSearchMode();
-}
-
-void ECEditorController ::ShowEditor()
-{
-    view.ShowView();
 }
 
 void ECEditorController ::InsertCharAt(int row, int col, const char c)
@@ -211,6 +145,70 @@ void ECEditorController ::AddNewLine(int row, int col)
     histCmds.ExecuteCmd(ec);
 }
 
+//----------------------------------------------------------------
+//           SEARCH MODE
+//----------------------------------------------------------------
+
+// Note about Search Mode - none of this is handled via commands due to the fact that it is not something that needs to be undone or redone
+
+void ECEditorController ::EnterSearchMode()
+{
+    editMode = FIND;
+    doc.EnterSearchMode();
+}
+
+void ECEditorController ::AddSearchChar(const char c)
+{
+    doc.AddSearchChar(c);
+}
+
+void ECEditorController ::RemoveSearchChar()
+{
+    doc.RemoveSearchChar();
+}
+
+void ECEditorController ::SendSearch()
+{
+    doc.ExecuteSearch();
+}
+
+//----------------------------------------------------------------
+//           REPLACE MODE
+//----------------------------------------------------------------
+
+void ECEditorController ::EnterReplaceMode()
+{
+    editMode = REPLACE;
+    doc.EnterReplaceMode();
+}
+
+void ECEditorController ::AddReplaceChar(const char c)
+{
+    doc.AddReplaceChar(c);
+}
+
+void ECEditorController ::RemoveReplaceChar()
+{
+    doc.RemoveReplaceChar();
+}
+
+void ECEditorController ::SendReplace()
+{
+    ReplaceCommand *rc = new ReplaceCommand(this->doc);
+    histCmds.ExecuteCmd(rc);
+
+    EnterSearchMode();
+}
+
+//----------------------------------------------------------------
+//           GENERAL FUNCTIONALITY
+//----------------------------------------------------------------
+
+void ECEditorController ::ShowEditor()
+{
+    view.ShowView();
+}
+
 bool ECEditorController ::Undo()
 {
     return histCmds.Undo();
@@ -220,3 +218,4 @@ bool ECEditorController ::Redo()
 {
     return histCmds.Redo();
 }
+

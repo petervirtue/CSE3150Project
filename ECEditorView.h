@@ -17,7 +17,6 @@ public:
     ~ECEditorView();
 
     // Observer functions
-
     void AttachController(ECObserver *ob);
 
     // Showing/Quitting the view
