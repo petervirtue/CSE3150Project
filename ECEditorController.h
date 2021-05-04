@@ -41,6 +41,7 @@ public:
 
     // Search/Replace Mode Changing
 
+    // Editing Mode
     void EnterEditingMode();
 
     // Replace Mode
